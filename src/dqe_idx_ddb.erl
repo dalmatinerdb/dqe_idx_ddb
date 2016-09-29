@@ -5,7 +5,7 @@
 -export([init/0,
          lookup/1, lookup/2, lookup_tags/1,
          collections/0, metrics/1, namespaces/1, namespaces/2,
-         tags/2, tags/3, values/3, values/4, expand/2,
+         tags/2, tags/3, values/3, values/4, expand/2, metric_variants/2,
          add/4, add/5, update/5,
          delete/4, delete/5]).
 
@@ -54,6 +54,21 @@ expand(Bkt, Globs) ->
             Ms2 = lists:usort(lists:flatten(Ms1)),
             {ok, {Bkt, Ms2}}
     end.
+
+-spec metric_variants(dqe_idx:collection(), Prefix::[dqe_idx:metric()]) ->
+                    {ok, [Metric::dqe_idx:metric()]} |
+                    {error, Error::term()}.
+
+metric_variants(Collection, []) ->
+    ddb_connection:list(Collection);
+metric_variants(Collection, Prefix) when is_list(Prefix) ->
+    N = length(Prefix),
+    {ok, Metrics} = ddb_connection:list(Collection),
+    MetricLs = [dproto:metric_to_list(Metric) || Metric <- Metrics],
+    Variants = [lists:nth(N + 1, MetricL) || MetricL <- MetricLs,
+                                             length(MetricL) > N,
+                                             lists:prefix(Prefix, MetricL)],
+    {ok, lists:usort(Variants)}.
 
 collections() ->
     ddb_connection:list().
