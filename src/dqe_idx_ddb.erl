@@ -62,8 +62,9 @@ expand(Bkt, Globs) ->
 metric_variants(Collection, []) ->
     ddb_connection:list(Collection);
 metric_variants(Collection, Prefix) when is_list(Prefix) ->
+    Prefix1 = dproto:metric_from_list(Prefix),
+    {ok, Metrics} = ddb_connection:list(Collection, Prefix1),
     N = length(Prefix),
-    {ok, Metrics} = ddb_connection:list(Collection),
     MetricLs = [dproto:metric_to_list(Metric) || Metric <- Metrics],
     Variants = [lists:nth(N + 1, MetricL) || MetricL <- MetricLs,
                                              length(MetricL) > N,
