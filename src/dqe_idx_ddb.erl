@@ -4,7 +4,7 @@
 %% API exports
 -export([init/0,
          lookup/1, lookup/2, lookup_tags/1,
-         collections/0, metrics/1, namespaces/1, namespaces/2,
+         collections/0, metrics/1, metrics/3, namespaces/1, namespaces/2,
          tags/2, tags/3, values/3, values/4, expand/2,
          add/4, add/5, update/5,
          delete/4, delete/5]).
@@ -26,13 +26,13 @@ lookup({'in', B, undefined}) ->
     {ok, lookup_all(B)};
 
 lookup({'in', B, M}) ->
-    {ok, [{B, dproto:metric_from_list(M)}]};
+    {ok, [{B, M}]};
 
 lookup({'in', B, undefined, _Where}) ->
     {ok, lookup_all(B)};
 
 lookup({'in', B, M, _Where}) ->
-    {ok, [{B, dproto:metric_from_list(M)}]}.
+    {ok, [{B, M}]}.
 
 lookup_tags(_) ->
     {ok, []}.
@@ -49,17 +49,31 @@ expand(Bkt, Globs) ->
         _ ->
             Ms1 = [begin
                        {ok, Ms} = ddb_connection:list(Bkt, P),
-                       Ms
+                       [dproto:metric_to_list(M) || M <- Ms]
                    end || P <- Ps2],
             Ms2 = lists:usort(lists:flatten(Ms1)),
             {ok, {Bkt, Ms2}}
     end.
 
+metrics(Collection, Prefix, Depth)
+  when Depth > 0,
+       is_list(Prefix) ->
+    Prefix1 = dproto:metric_from_list(Prefix),
+    {ok, Metrics} = ddb_connection:list(Collection, Prefix1),
+    N = length(Prefix),
+    MetricLs = [dproto:metric_to_list(Metric) || Metric <- Metrics],
+    Variants = [lists:sublist(ML, N + 1, Depth) || ML <- MetricLs,
+                                                   length(ML) > N,
+                                                   lists:prefix(Prefix, ML)],
+    {ok, lists:usort(Variants)}.
+
 collections() ->
     ddb_connection:list().
 
 metrics(Bucket) ->
-    ddb_connection:list(Bucket).
+    {ok, Ms} = ddb_connection:list(Bucket),
+    Ms1 = [dproto:metric_to_list(M) || M <- Ms],
+    {ok, Ms1}.
 
 namespaces(_) ->
     {ok, []}.
@@ -127,4 +141,4 @@ compress_prefixes([A, B | R], Acc) ->
 
 lookup_all(Bucket) ->
     {ok, Ms} = ddb_connection:list(Bucket),
-    [{Bucket, M} || M <- Ms].
+    [{Bucket, dproto:metric_to_list(M)} || M <- Ms].
