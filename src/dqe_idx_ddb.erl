@@ -54,6 +54,7 @@ expand(Bkt, Globs) ->
             Ms2 = lists:usort(lists:flatten(Ms1)),
             {ok, {Bkt, Ms2}}
     end.
+
 metrics(Collection, Prefix, Depth)
   when Depth > 0,
        is_list(Prefix) ->
