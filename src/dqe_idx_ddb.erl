@@ -4,8 +4,8 @@
 %% API exports
 -export([init/0,
          lookup/1, lookup/2, lookup_tags/1,
-         collections/0, metrics/1, namespaces/1, namespaces/2,
-         tags/2, tags/3, values/3, values/4, expand/2, metric_variants/2,
+         collections/0, metrics/1, metrics/3, namespaces/1, namespaces/2,
+         tags/2, tags/3, values/3, values/4, expand/2,
          add/4, add/5, update/5,
          delete/4, delete/5]).
 
@@ -38,7 +38,7 @@ lookup_tags(_) ->
     {ok, []}.
 
 -spec expand(dqe_idx:bucket(), [dqe_idx:glob_metric()]) ->
-                    {ok, {dqe_idx:bucket(), dqe_idx:metric()}}.
+                    {ok, {dqe_idx:bucket(), [dqe_idx:metric()]}}.
 expand(Bkt, Globs) ->
     Ps1 = lists:map(fun glob_prefix/1, Globs),
     Ps2 = compress_prefixes(Ps1),
@@ -54,17 +54,16 @@ expand(Bkt, Globs) ->
             Ms2 = lists:usort(lists:flatten(Ms1)),
             {ok, {Bkt, Ms2}}
     end.
-
-metric_variants(Collection, []) ->
-    metrics(Collection);
-metric_variants(Collection, Prefix) when is_list(Prefix) ->
+metrics(Collection, Prefix, Depth)
+  when Depth > 0,
+       is_list(Prefix) ->
     Prefix1 = dproto:metric_from_list(Prefix),
     {ok, Metrics} = ddb_connection:list(Collection, Prefix1),
     N = length(Prefix),
     MetricLs = [dproto:metric_to_list(Metric) || Metric <- Metrics],
-    Variants = [lists:nth(N + 1, MetricL) || MetricL <- MetricLs,
-                                             length(MetricL) > N,
-                                             lists:prefix(Prefix, MetricL)],
+    Variants = [lists:sublist(ML, N + 1, Depth) || ML <- MetricLs,
+                                                   length(ML) > N,
+                                                   lists:prefix(Prefix, ML)],
     {ok, lists:usort(Variants)}.
 
 collections() ->
