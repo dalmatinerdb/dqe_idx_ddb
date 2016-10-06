@@ -26,19 +26,19 @@ lookup({'in', B, undefined}) ->
     {ok, lookup_all(B)};
 
 lookup({'in', B, M}) ->
-    {ok, [{B, dproto:metric_from_list(M)}]};
+    {ok, [{B, M}]};
 
 lookup({'in', B, undefined, _Where}) ->
     {ok, lookup_all(B)};
 
 lookup({'in', B, M, _Where}) ->
-    {ok, [{B, dproto:metric_from_list(M)}]}.
+    {ok, [{B, M}]}.
 
 lookup_tags(_) ->
     {ok, []}.
 
 -spec expand(dqe_idx:bucket(), [dqe_idx:glob_metric()]) ->
-                    {ok, {dqe_idx:bucket(), [dqe_idx:metric()]}}.
+                    {ok, {dqe_idx:bucket(), dqe_idx:metric()}}.
 expand(Bkt, Globs) ->
     Ps1 = lists:map(fun glob_prefix/1, Globs),
     Ps2 = compress_prefixes(Ps1),
@@ -49,18 +49,14 @@ expand(Bkt, Globs) ->
         _ ->
             Ms1 = [begin
                        {ok, Ms} = ddb_connection:list(Bkt, P),
-                       Ms
+                       [dproto:metric_to_list(M) || M <- Ms]
                    end || P <- Ps2],
             Ms2 = lists:usort(lists:flatten(Ms1)),
             {ok, {Bkt, Ms2}}
     end.
 
--spec metric_variants(dqe_idx:collection(), Prefix::[dqe_idx:metric()]) ->
-                    {ok, [Metric::dqe_idx:metric()]} |
-                    {error, Error::term()}.
-
 metric_variants(Collection, []) ->
-    ddb_connection:list(Collection);
+    metrics(Collection);
 metric_variants(Collection, Prefix) when is_list(Prefix) ->
     Prefix1 = dproto:metric_from_list(Prefix),
     {ok, Metrics} = ddb_connection:list(Collection, Prefix1),
@@ -75,7 +71,9 @@ collections() ->
     ddb_connection:list().
 
 metrics(Bucket) ->
-    ddb_connection:list(Bucket).
+    {ok, Ms} = ddb_connection:list(Bucket),
+    Ms1 = [dproto:metric_to_list(M) || M <- Ms],
+    {ok, Ms1}.
 
 namespaces(_) ->
     {ok, []}.
@@ -143,4 +141,4 @@ compress_prefixes([A, B | R], Acc) ->
 
 lookup_all(Bucket) ->
     {ok, Ms} = ddb_connection:list(Bucket),
-    [{Bucket, M} || M <- Ms].
+    [{Bucket, dproto:metric_to_list(M)} || M <- Ms].
