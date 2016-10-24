@@ -49,10 +49,11 @@ expand(Bkt, Globs) ->
         _ ->
             Ms1 = [begin
                        {ok, Ms} = ddb_connection:list(Bkt, P),
-                       [dproto:metric_to_list(M) || M <- Ms]
+                       [M || M <- Ms]
                    end || P <- Ps2],
             Ms2 = lists:usort(lists:flatten(Ms1)),
-            {ok, {Bkt, Ms2}}
+            Ms3 = [dproto:metric_to_list(M) || M <- Ms2],
+            {ok, {Bkt, Ms3}}
     end.
 
 metrics(Collection, Prefix, Depth)
