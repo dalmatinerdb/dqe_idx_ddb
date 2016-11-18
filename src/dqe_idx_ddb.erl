@@ -4,7 +4,7 @@
 %% API exports
 -export([init/0,
          lookup/1, lookup/2, lookup_tags/1,
-         collections/0, metrics/1, metrics/3, namespaces/1, namespaces/2,
+         collections/0, metrics/1, metrics/4, namespaces/1, namespaces/2,
          tags/2, tags/3, values/3, values/4, expand/2,
          add/4, add/5, update/5,
          delete/4, delete/5]).
@@ -56,7 +56,7 @@ expand(Bkt, Globs) ->
             {ok, {Bkt, Ms3}}
     end.
 
-metrics(Collection, Prefix, Depth)
+metrics(Collection, Prefix, _Tags, Depth)
   when Depth > 0,
        is_list(Prefix) ->
     Prefix1 = dproto:metric_from_list(Prefix),
