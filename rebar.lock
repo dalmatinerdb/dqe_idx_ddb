@@ -1,6 +1,6 @@
 {"1.1.0",
 [{<<"ddb_client">>,{pkg,<<"ddb_client">>,<<"0.2.0">>},1},
- {<<"ddb_connection">>,{pkg,<<"ddb_connection">>,<<"0.1.19">>},0},
+ {<<"ddb_connection">>,{pkg,<<"ddb_connection">>,<<"0.1.20">>},0},
  {<<"dproto">>,{pkg,<<"dproto">>,<<"0.2.1">>},0},
  {<<"dqe_idx">>,{pkg,<<"dqe_idx">>,<<"0.2.1">>},0},
  {<<"jsxd">>,{pkg,<<"jsxd">>,<<"0.2.3">>},1},
@@ -10,7 +10,7 @@
 [
 {pkg_hash,[
  {<<"ddb_client">>, <<"CAFEFB981C6697303285C23EA6C160EB9CD37D516AD4BF2D33126E2BDB0DC571">>},
- {<<"ddb_connection">>, <<"8B91915E1526E974E408EBA80509B6D9F32A35234C82C78109C209EE6391CE4D">>},
+ {<<"ddb_connection">>, <<"600C18E0910CE0A6744941A74AEEB569D5BABF15D5282A442C24B5635DA71CAD">>},
  {<<"dproto">>, <<"2CDE2CDA36A80CE062CB90DC1EBEC4DF7AAF658AB40ED88D4A765A6C33DD441A">>},
  {<<"dqe_idx">>, <<"6BD1F0DE217DF0B213BD86CDBE19F5EEDBCAF0D5CBD51D955DB574A5C2DBA1EE">>},
  {<<"jsxd">>, <<"B2DBBB24A91536C50F75372FB8E28CD16691707AB53BE9449C59A8A611A581A2">>},
