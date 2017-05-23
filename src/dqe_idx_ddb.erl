@@ -48,7 +48,7 @@ expand(Bkt, Globs) ->
             {ok, {Bkt, Ms}};
         _ ->
             Ms1 = [begin
-                       {ok, Ms} = ddb_connection:list(Bkt, P),
+                       {ok, Ms} = ddb_connection:list_pfx(Bkt, P),
                        [M || M <- Ms]
                    end || P <- Ps2],
             Ms2 = lists:usort(lists:flatten(Ms1)),
@@ -60,7 +60,7 @@ metrics(Collection, Prefix, Depth)
   when Depth > 0,
        is_list(Prefix) ->
     Prefix1 = dproto:metric_from_list(Prefix),
-    {ok, Metrics} = ddb_connection:list(Collection, Prefix1),
+    {ok, Metrics} = ddb_connection:list_pfx(Collection, Prefix1),
     N = length(Prefix),
     MetricLs = [dproto:metric_to_list(Metric) || Metric <- Metrics],
     Variants = [lists:sublist(ML, N + 1, Depth) || ML <- MetricLs,
@@ -69,7 +69,7 @@ metrics(Collection, Prefix, Depth)
     {ok, lists:usort(Variants)}.
 
 collections() ->
-    ddb_connection:list().
+    ddb_connection:list_buckets().
 
 metrics(Bucket) ->
     {ok, Ms} = ddb_connection:list(Bucket),

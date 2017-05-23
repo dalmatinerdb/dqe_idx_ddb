@@ -1,7 +1,7 @@
 {"1.1.0",
 [{<<"ddb_client">>,{pkg,<<"ddb_client">>,<<"0.5.5">>},1},
- {<<"ddb_connection">>,{pkg,<<"ddb_connection">>,<<"0.2.2">>},0},
- {<<"dproto">>,{pkg,<<"dproto">>,<<"0.4.1">>},0},
+ {<<"ddb_connection">>,{pkg,<<"ddb_connection">>,<<"0.4.2">>},0},
+ {<<"dproto">>,{pkg,<<"dproto">>,<<"0.5.2">>},0},
  {<<"dqe_idx">>,{pkg,<<"dqe_idx">>,<<"0.3.0">>},0},
  {<<"dynamic_compile">>,{pkg,<<"dynamic_compile">>,<<"1.0.0">>},2},
  {<<"ibrowse">>,{pkg,<<"ibrowse">>,<<"4.4.0">>},2},
@@ -13,8 +13,8 @@
 [
 {pkg_hash,[
  {<<"ddb_client">>, <<"86DDDCE3B379DD3B0B425299DCE86CA49AB00DE8B59DE876EF3F1FA780F39F11">>},
- {<<"ddb_connection">>, <<"0F4A7B76E265C4C1C45EE44791E4CC039AD695DA58653293EE6E148AFD6F1369">>},
- {<<"dproto">>, <<"A34C93BC248C9E06CF9098042EC14BB8B18A046FC5BFF986A128001F7E977C2F">>},
+ {<<"ddb_connection">>, <<"D59222829EE5DFF89690AAD2E26D422C30BB14F1AA5A61A7921BF02D58735DB8">>},
+ {<<"dproto">>, <<"D1C9929353589BD395CAB3E5C6E1CFC4DC8B0660527145E2DD221771D4467ABD">>},
  {<<"dqe_idx">>, <<"EDCA91E5130C532D4B33AF678197ADC25AA4FA7471AC75033290F8AD8392874D">>},
  {<<"dynamic_compile">>, <<"8171B2CB4953EA3ED2EF63F5B26ABF677ACD0CA32210C2A08A7A8406A743F76B">>},
  {<<"ibrowse">>, <<"2D923325EFE0D2CB09B9C6A047B2835A5EDA69D8A47ED6FF8BC03628B764E991">>},
