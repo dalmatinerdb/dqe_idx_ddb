@@ -31,8 +31,8 @@ lookup({'in', B, M}, Start, Finish, _Opts) ->
 lookup({'in', B, undefined, _Where}, Start, Finish, _Opts) ->
     {ok, lookup_all(B, Start, Finish)};
 
-lookup({'in', B, M, _Where}, Start, Finish, _Opts) ->
-    {ok, [{B, M, [{Start, Finish, default}]}]}.
+lookup({'in', B, M, _Where}, Start, Finish, Opts) ->
+    lookup({'in', B, M}, Start, Finish, Opts).
 
 lookup_tags(_) ->
     {ok, []}.
