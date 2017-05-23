@@ -3,7 +3,7 @@
 
 %% API exports
 -export([init/0,
-         lookup/1, lookup/2, lookup_tags/1,
+         lookup/4, lookup/5, lookup_tags/1,
          collections/0, metrics/1, metrics/3, namespaces/1, namespaces/2,
          tags/2, tags/3, values/3, values/4, expand/2,
          add/4, add/5, update/5,
@@ -18,21 +18,21 @@ init() ->
     %% We do not need to initialize anything here.
     ok.
 
-lookup(Q, _G) ->
-    {ok, [{B, M}]} = lookup(Q),
-    {ok, [{B, M, []}]}.
+lookup(Q, Start, Finish, _G, Opts) ->
+    {ok, [D]} = lookup(Q, Start, Finish, Opts),
+    {ok, [{D, []}]}.
 
-lookup({'in', B, undefined}) ->
-    {ok, lookup_all(B)};
+lookup({'in', B, undefined}, Start, Finish, _Opts) ->
+    {ok, lookup_all(B, Start, Finish)};
 
-lookup({'in', B, M}) ->
-    {ok, [{B, M}]};
+lookup({'in', B, M}, Start, Finish, _Opts) ->
+    {ok, [{B, M, [{Start, Finish, default}]}]};
 
-lookup({'in', B, undefined, _Where}) ->
-    {ok, lookup_all(B)};
+lookup({'in', B, undefined, _Where}, Start, Finish, _Opts) ->
+    {ok, lookup_all(B, Start, Finish)};
 
-lookup({'in', B, M, _Where}) ->
-    {ok, [{B, M}]}.
+lookup({'in', B, M, _Where}, Start, Finish, Opts) ->
+    lookup({'in', B, M}, Start, Finish, Opts).
 
 lookup_tags(_) ->
     {ok, []}.
@@ -48,7 +48,7 @@ expand(Bkt, Globs) ->
             {ok, {Bkt, Ms}};
         _ ->
             Ms1 = [begin
-                       {ok, Ms} = ddb_connection:list(Bkt, P),
+                       {ok, Ms} = ddb_connection:list_pfx(Bkt, P),
                        [M || M <- Ms]
                    end || P <- Ps2],
             Ms2 = lists:usort(lists:flatten(Ms1)),
@@ -60,7 +60,7 @@ metrics(Collection, Prefix, Depth)
   when Depth > 0,
        is_list(Prefix) ->
     Prefix1 = dproto:metric_from_list(Prefix),
-    {ok, Metrics} = ddb_connection:list(Collection, Prefix1),
+    {ok, Metrics} = ddb_connection:list_pfx(Collection, Prefix1),
     N = length(Prefix),
     MetricLs = [dproto:metric_to_list(Metric) || Metric <- Metrics],
     Variants = [lists:sublist(ML, N + 1, Depth) || ML <- MetricLs,
@@ -69,7 +69,7 @@ metrics(Collection, Prefix, Depth)
     {ok, lists:usort(Variants)}.
 
 collections() ->
-    ddb_connection:list().
+    ddb_connection:list_buckets().
 
 metrics(Bucket) ->
     {ok, Ms} = ddb_connection:list(Bucket),
@@ -140,6 +140,6 @@ compress_prefixes([A, B | R], Acc) ->
             compress_prefixes([B | R], [A | Acc])
     end.
 
-lookup_all(Bucket) ->
+lookup_all(Bucket, Start, Finish) ->
     {ok, Ms} = ddb_connection:list(Bucket),
-    [{Bucket, dproto:metric_to_list(M)} || M <- Ms].
+    [{Bucket, dproto:metric_to_list(M), [{Start, Finish, default}]} || M <- Ms].
