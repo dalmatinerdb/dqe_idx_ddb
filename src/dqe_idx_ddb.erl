@@ -6,7 +6,7 @@
          lookup/4, lookup/5, lookup_tags/1,
          collections/0, metrics/1, metrics/3, namespaces/1, namespaces/2,
          tags/2, tags/3, values/3, values/4, expand/2,
-         add/4, add/5, update/5,
+         add/5, add/6, update/5, touch/1,
          delete/4, delete/5]).
 
 %%====================================================================
@@ -94,10 +94,13 @@ values(_, _, _) ->
 values(_, _, _, _) ->
     {ok, []}.
 
-add(_, _, _, _) ->
-    {ok, 0}.
+touch(_) ->
+    ok.
 
 add(_, _, _, _, _) ->
+    {ok, 0}.
+
+add(_, _, _, _, _, _) ->
     {ok, 0}.
 
 update(_, _, _, _, _) ->
